@@ -1,0 +1,85 @@
+# make sure all | are escaped
+SKIP_LIST="*\|adams-branch\|product-branch\|master\|staging-qa"
+
+function branchcleanup {
+  g co master
+  g fetch
+  if [ $1 ]
+  then
+    KIND=$1
+  else
+    KIND='a'
+  fi
+  for branch in $(g br -$KIND | grep -v -e $SKIP_LIST | cut -d' ' -f3,4,5 | cut -d'/' -f3,4 | sort | uniq); do
+    diffs="n"
+    g co $branch &>/dev/null && 
+    g pl &>/dev/null ;   
+    g m master &>/dev/null && 
+    diffs=`g df --name-only master | wc -l | tr -d "[:space:]"` && 
+    if [ "$diffs" = "0" ] 
+    then 
+      read -p "Branch ${branch} has ${diffs} changes, should we delete it? (y/n) [y]: " delete
+      delete=${delete:-y}
+      if [ "$delete" = "y" ]
+      then
+        g br -D ${branch} &>/dev/null
+        grb delete ${branch} &>/dev/null
+        if [ $? = 1 ]
+        then
+          echo "    -> deletion of ${branch} failed"
+        else
+          echo "    -> deletion of ${branch} succeeded"
+        fi  
+      else
+        echo "${branch} not deleted"
+      fi
+    else
+      echo "# branch '${branch}' has ${diffs} changes"
+    fi # echo "There was a conflict, please resolve and re-run the script.")
+  done
+}
+
+function trackall {
+  g br -$1
+  # g fetch
+  # for branch in $(g br -r | grep -v -e $SKIP_LIST | cut -d' ' -f3); do 
+  #   echo "getting... ${branch}"
+  #   g co `echo $branch | cut -d'/' -f2`
+  #   echo "got ${branch}"
+  # done
+}
+
+function cleanstagbranches {
+  allbranches=`g br -a | grep -v -e $SKIP_LIST | cut -d' ' -f3,4,5 | cut -d'/' -f3,4 | sort | uniq`
+  g fetch
+  for envnumber in 1 2 3 4
+  do
+    echo "-> topics that are on staging-qa${envnumber} <-"
+    g co staging-qa${envnumber}
+    g reset --hard origin/master
+    for branch in $(g log master...staging-qa${envnumber} | grep Merge | grep branch | cut -d' ' -f7 | cut -d"'" -f2 | sort | uniq | grep -v -e $SKIP_LIST | cut -d' ' -f3); do 
+      if [[ "$allbranches" == *"$branch"* ]]
+      then
+        g merge $branch
+      fi
+    done
+    g push --force origin staging-qa${envnumber}
+  done
+}
+
+function where {
+  allbranches=`g br -a | grep -v -e $SKIP_LIST | cut -d' ' -f3,4,5 | cut -d'/' -f3,4 | sort | uniq`
+  g fetch
+  for envnumber in 1 2 3 4
+  do
+    echo "-> topics that are on staging-qa${envnumber} <-"
+    for branch in $(g log master...staging-qa${envnumber} | grep Merge | grep branch | cut -d' ' -f7 | cut -d"'" -f2 | sort | uniq | grep -v -e $SKIP_LIST | cut -d' ' -f3); do 
+      if [[ "$allbranches" == *"$branch"* ]]
+      then
+        echo " +  ${branch}"
+      else
+        echo " -  ${branch}"
+      fi
+    done
+  done
+}

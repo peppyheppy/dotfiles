@@ -1,0 +1,2 @@
+export POW_WORKERS=1
+export POW_DOMAINS=dev

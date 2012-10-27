@@ -1,0 +1,47 @@
+[user]
+	name = Paul Hepworth
+	email = paul.hepworth@peppyheppy.com
+[merge]
+	tool = opendiff
+[core]
+	editor = vim
+[color]
+	branch = auto
+	ui = true
+[alias]
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	df = diff
+	lg = log -p
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit
+	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	ls = ls-files
+	who = shortlog -s --
+	k = !gitk
+	x = !gitx
+        alias = !sh -c 'g config --global -l | grep alias | sed s/alias.//g | sort'
+	plr = pull --rebase
+	pl = pull
+	ps = push
+	ss = stash save
+        sp = stash pop
+	ba = branch -a
+	tip = !sh -c 'g log -n 1 | head -n 1'
+        pso = !bash -l -c 'g pl && g ps origin `echo $(__git_ps1 \"%s\") | cut -d\" \" -f1 | cut -d\"=\" -f1 | cut -d\">\" -f1 | cut -d\"<\" -f1`'
+        sb  = !bash -l -c 'echo -n $(__git_ps1 \"%s\") | cut -d\" \" -f1 | cut -d\"=\" -f1 | cut -d\">\" -f1 | cut -d\"<\" -f1 > ~/.gitsavedbranch'
+        sbm  = !bash -l -c 'g merge `cat ~/.gitsavedbranch`'
+        sbp  = !bash -l -c 'cat ~/.gitsavedbranch'
+        m = merge --no-ff 
+        stag = "!f() { g sb && g pso && g co staging-qa$1 && g pl && g merge `cat ~/.gitsavedbranch` && g pso && g co `cat ~/.gitsavedbranch`; }; f"
+        up = "!f() { g sb && g co master && g pl && g checkout `cat ~/.gitsavedbranch` && g m master; }; f"
+        upstag = "!f() { g co master && g pl && for br in 1 2 3 4; do g co staging-qa${br} && g pl && g merge master; done && g push; }; f"
+        heroku = push heroku master
+        cleanup = !bash -l -c 'source ~/.gitfunctions && branchcleanup a'
+        trackall = !bash -l -c 'source ~/.gitfunctions && trackall l'
+        resetstaging = !bash -l -c 'source ~/.gitfunctions && cleanstagbranches'
+        where = !bash -l -c 'source ~/.gitfunctions && where'
+
+[heroku]
+	account = personal
