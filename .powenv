@@ -1,1 +1,2 @@
 export RUBYOPT="-r ruby-debug"
+# export RAILS_ENV=production

@@ -11,30 +11,38 @@ function branchcleanup {
     KIND='a'
   fi
   for branch in $(g br -$KIND | grep -v -e $SKIP_LIST | cut -d' ' -f3,4,5 | cut -d'/' -f3,4 | sort | uniq); do
-    diffs="n"
-    g co $branch &>/dev/null && 
-    g pl &>/dev/null ;   
-    g m master &>/dev/null && 
-    diffs=`g df --name-only master | wc -l | tr -d "[:space:]"` && 
-    if [ "$diffs" = "0" ] 
-    then 
-      read -p "Branch ${branch} has ${diffs} changes, should we delete it? (y/n) [y]: " delete
-      delete=${delete:-y}
-      if [ "$delete" = "y" ]
-      then
-        g br -D ${branch} &>/dev/null
-        grb delete ${branch} &>/dev/null
-        if [ $? = 1 ]
+    read -p "Skip branch ${branch}? (y/n) [n]: " skip
+    skip=${skip:-n}
+    if [ "$skip" = "n" ]
+    then
+      diffs="n"
+      g co $branch &>/dev/null && 
+      g pl &>/dev/null ;   
+      g m master &>/dev/null && 
+      diffs=`g df --name-only master | wc -l | tr -d "[:space:]"` && 
+      if [ "$diffs" = "0" ] 
+      then 
+        read -p "Branch ${branch} has ${diffs} changes, should we delete it? (y/n) [y]: " delete
+        delete=${delete:-y}
+        if [ "$delete" = "y" ]
         then
-          echo "    -> deletion of ${branch} failed"
+          g co master
+          g br -D ${branch} &>/dev/null
+          grb delete ${branch} &>/dev/null
+          if [ $? = 1 ]
+          then
+            echo "    -> deletion of ${branch} failed"
+          else
+            echo "    -> deletion of ${branch} succeeded"
+          fi  
         else
-          echo "    -> deletion of ${branch} succeeded"
-        fi  
+          echo "${branch} not deleted"
+        fi
       else
-        echo "${branch} not deleted"
-      fi
+        echo "# branch '${branch}' has ${diffs} changes"
+      fi # echo "There was a conflict, please resolve and re-run the script.")
     else
-      echo "# branch '${branch}' has ${diffs} changes"
+      echo "Skiping ${branch}"
     fi # echo "There was a conflict, please resolve and re-run the script.")
   done
 }

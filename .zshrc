@@ -34,31 +34,9 @@ plugins=(git)
 # takes 30 seconds to load, why?
 source $ZSH/oh-my-zsh.sh
 
-# SLOAN'S STUFF
-GIT_MERGE_AUTOEDIT=no
-export GIT_MERGE_AUTOEDIT
-
-unalias gco
-gco()
-{
-  git checkout $*
-  if [[ -s $PWD/.rvmrc ]] ; then
-    echo "Reloading rvmrc from $PWD/.rvmrc"
-    unset rvm_rvmrc_cwd
-    source $PWD/.rvmrc
-  fi
-}
-# EOF SLOAN'S STUFF
-
-# stag() { git stag "$@" }
-# compdef _git stag=git-branch
-
 setopt no_complete_aliases
 
 # Customize to your needs...
-# export PATH=/usr/local/sbin:/Users/heppy/bin:/usr/local/bin:/Users/heppy/bin:/Users/heppy/.rvm/gems/ruby-1.9.2-p318@copycopter-ut/bin:/Users/heppy/.rvm/gems/ruby-1.9.2-p318@global/bin:/Users/heppy/.rvm/rubies/ruby-1.9.2-p318/bin:/Users/heppy/.rvm/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
-
-# # # # # CUSTOM # # # # #
 
 # Speed up terminal windows / tabs
 # http://osxdaily.com/2010/05/06/speed-up-a-slow-terminal-by-clearing-log-files/
@@ -67,10 +45,17 @@ setopt no_complete_aliases
 # Load RVM if there is a .rvmrc file in the current directory
 load_rvm()
 {
-  if [[ -s $PWD/.rvmrc ]] ; then
-    [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
+  if [[ -s $PWD/.rvmrc || -s $PWD/.ruby-version ]] ; then
+   [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
     unset rvm_rvmrc_cwd
-    source $PWD/.rvmrc
+
+    if [ -f ".rvmrc" ]; then
+      source ".rvmrc"
+    elif [ -f ".ruby-gemset" ]; then
+      rvm use `cat .ruby-version`@`cat .ruby-gemset` --create
+    else
+      rvm use `cat .ruby-version`
+    fi
   fi
 }
 
@@ -85,17 +70,8 @@ function chpwd() {
     fi
 }
 
-# Add my personal bin to PATH
-export PATH=~/bin:$PATH
-
 # Allows for Ctl+O
 /bin/stty -iexten
-
-#### EXPORTS
-# Extend PATH
-export PATH=/usr/local/Cellar/macvim/7.3-64/bin:/usr/local/sbin:~/bin:/usr/local/bin:$PATH
-export GEM_PRIVATE_KEY='~/.ssh/gem-private_key.pem'
-export GEM_CERTIFICATE_CHAIN='~/.ssh/gem-public_cert.pem'
 
 # Make bash check it's window size after a process completes
 # shopt -s checkwinsize
@@ -111,35 +87,52 @@ alias bi='bundle install'
 alias reload='. ~/.zshrc'
 alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
 alias dtp='rake db:test:prepare'
-alias g='git'
+# alias g='hub'
 alias rctags='ctags -R --exclude=.git --exclude=log * $GEM_HOME/*'
+alias faster='sudo rm -rf /private/var/log/asl/*.asl; dscacheutil -flushcache; purge'
 
 # User Testing
-alias ut='cd /Users/heppy/Sites/usertesting'
-alias uto='cd /Users/heppy/Sites/usertesting/orders'
-alias utm='cd /Users/heppy/Sites/usertesting/wordpress'
-alias utc='cd /Users/heppy/Sites/usertesting/authentication'
-alias utprod='ssh deploy@www.usertesting.com'
-alias utstag='ssh deploy@www.qa1.usertesting.com'
-alias utci='ssh deploy@67.214.218.39'
-alias utredis='ssh deploy@67.214.220.189'
+alias ut='cd /Users/peppyheppy/Sites/usertesting'
+alias uto='cd /Users/peppyheppy/Sites/usertesting/orders'
+alias utm='cd /Users/peppyheppy/Sites/usertesting/wordpress'
+alias utc='cd /Users/peppyheppy/Sites/usertesting/authentication'
 
-# Project Specific
-alias mislice='ssh paul@67.207.133.109'
-alias ss="export RAILS_ENV=development ; cd /Users/heppy/Sites/simplyscrum.com"
-alias eqapp="export RAILS_ENV=development ; cd /Users/heppy/Documents/MyDocuments/church/eqapps/eqapp"
-alias projects="cd ~/Documents/MyDocuments/projects"
-alias remail="export RAILS_ENV=development ; cd /Users/heppy/Sites/remailed/nonameapp"
-alias smt="export RAILS_ENV=development ; cd /Users/heppy/Sites/reccenter/signmeto.roadrunnerrecords.com ; rvm 1.8.7 ; rvm gemset  create smt ; rvm gemset use smt"
-alias rrr="cd ~/Sites/reccenter/roadrunner-records-com"
-
-# alias dts4='rake parallel:spec[4]'
+# User Testing hosts
+alias utosx='ssh admin@209.97.200.169'
+alias app01='ssh deploy@app01.c45367.blueboxgrid.com'
+alias app02='ssh deploy@app02.c45367.blueboxgrid.com'
+alias app03='ssh deploy@app03.c45367.blueboxgrid.com'
+alias app04='ssh deploy@app04.c45367.blueboxgrid.com'
+alias app04su='ssh ${UT_USER}@app04.c45367.blueboxgrid.com'
+alias app02su='ssh ${UT_USER}@app02.c45367.blueboxgrid.com'
+alias app03su='ssh ${UT_USER}@app03.c45367.blueboxgrid.com'
+alias db01='ssh ${UT_USER}@db01.c45367.blueboxgrid.com'
+alias db02='ssh ${UT_USER}@db02.c45367.blueboxgrid.com'
+alias util01='ssh deploy@util01.c45367.blueboxgrid.com'
+alias uttvr='ssh root@174.129.224.216'
+alias utconroy='ssh qa@208.83.107.248'
+alias qa01='ssh deploy@qa01.c45367.blueboxgrid.com'
+alias qa01su='ssh ${UT_USER}@qa01.c45367.blueboxgrid.com'
+alias pub01='ssh deploy@pub01.c45367.blueboxgrid.com'
+alias staging01='ssh deploy@www.qa1.usertesting.com'
 alias remem='sudo launchctl stop org.macports.memcached; sudo launchctl start org.macports.memcached'
+
+#### EXPORTS
+export ARCHFLAGS="-arch x86_64"
+export GIT_MERGE_AUTOEDIT=no
+export SSL_CERT_FILE=/usr/local/opt/curl-ca-bundle/share/ca-bundle.crt
+export GEM_PRIVATE_KEY='~/.ssh/gem-private_key.pem'
+export GEM_CERTIFICATE_CHAIN='~/.ssh/gem-public_cert.pem'
 
 # environment vars for apps, etc
 export NODE_PATH="/usr/local/lib/node"
 export MEMCACHE_SERVERS='127.0.0.1'
-export RSPEC_FORMAT='nested'
-export DONT_OVERRIDE_MY_LOGIN=true
+
+# usertesting specific
 export RUN_JS=true
 export DO_SAUCE=true
+
+unalias g
+
+# load all user specific aliases and environment vars from .me
+[[ -s "$HOME/.me" ]] && . "$HOME/.me" || echo "Unable to load ~/.me profile settings"

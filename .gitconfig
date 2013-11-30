@@ -1,5 +1,5 @@
 [user]
-	name = Paul Hepworth
+	name = peppyheppy
 	email = paul.hepworth@peppyheppy.com
 [merge]
 	tool = opendiff
@@ -9,7 +9,7 @@
 	branch = auto
 	ui = true
 [alias]
-	st = status
+        st = status
 	ci = commit
 	br = branch
 	co = checkout
@@ -23,14 +23,15 @@
 	x = !gitx
         alias = !sh -c 'g config --global -l | grep alias | sed s/alias.//g | sort'
 	plr = pull --rebase
+	isg = !bash -l -p -c 'g st'
 	pl = pull
 	ps = push
 	ss = stash save
         sp = stash pop
 	ba = branch -a
 	tip = !sh -c 'g log -n 1 | head -n 1'
-        pso = !bash -l -c 'g pl && g ps origin `echo $(__git_ps1 \"%s\") | cut -d\" \" -f1 | cut -d\"=\" -f1 | cut -d\">\" -f1 | cut -d\"<\" -f1`'
-        sb  = !bash -l -c 'echo -n $(__git_ps1 \"%s\") | cut -d\" \" -f1 | cut -d\"=\" -f1 | cut -d\">\" -f1 | cut -d\"<\" -f1 > ~/.gitsavedbranch'
+        pso = !bash -l -c 'g pl && g ps origin `git rev-parse --abbrev-ref HEAD'
+        sb  = !bash -l -c 'git rev-parse --abbrev-ref HEAD > ~/.gitsavedbranch'
         sbm  = !bash -l -c 'g merge `cat ~/.gitsavedbranch`'
         sbp  = !bash -l -c 'cat ~/.gitsavedbranch'
         m = merge --no-ff 
@@ -38,10 +39,18 @@
         up = "!f() { g sb && g co master && g pl && g checkout `cat ~/.gitsavedbranch` && g m master; }; f"
         upstag = "!f() { g co master && g pl && for br in 1 2 3 4; do g co staging-qa${br} && g pl && g merge master; done && g push; }; f"
         heroku = push heroku master
-        cleanup = !bash -l -c 'source ~/.gitfunctions && branchcleanup a'
+        cleanup = !bash -l -p -c 'source ~/.gitfunctions && branchcleanup a'
         trackall = !bash -l -c 'source ~/.gitfunctions && trackall l'
         resetstaging = !bash -l -c 'source ~/.gitfunctions && cleanstagbranches'
         where = !bash -l -c 'source ~/.gitfunctions && where'
+        pr = !bash -l -c 'hub pull-request'
+        pub = !bash -l -c 'g sb && grb publish `cat ~/.gitsavedbranch`'
+        pubpr = !bash -l -c 'g pub && g pr'
+        ap = !bash -l -c 'g ci --amend -C HEAD'
 
 [heroku]
 	account = personal
+[help]
+	autocorrect = 1
+[rerere]
+	enabled = 1

@@ -1,2 +1,3 @@
 export POW_WORKERS=1
 export POW_DOMAINS=dev
+export POW_TIMEOUT=10800
