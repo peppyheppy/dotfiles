@@ -29,7 +29,7 @@ ZSH_THEME="robbyrussell-mod"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git)
+plugins=(git rails ruby brew bundler gem pow rvm)
 
 # takes 30 seconds to load, why?
 source $ZSH/oh-my-zsh.sh
@@ -81,9 +81,6 @@ alias cd..="cd .."
 alias la="ls -hall"
 alias migrate='rake db:migrate && rake db:test:prepare'
 alias route='rake routes | grep '
-alias bu='bundle update'
-alias be='bundle exec'
-alias bi='bundle install'
 alias reload='. ~/.zshrc'
 alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
 alias dtp='rake db:test:prepare'

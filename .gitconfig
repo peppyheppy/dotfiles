@@ -30,7 +30,7 @@
         sp = stash pop
 	ba = branch -a
 	tip = !sh -c 'g log -n 1 | head -n 1'
-        pso = !bash -l -c 'g pl && g ps origin `git rev-parse --abbrev-ref HEAD'
+        pso = !bash -l -c 'g pl && g ps origin `git rev-parse --abbrev-ref HEAD`'
         sb  = !bash -l -c 'git rev-parse --abbrev-ref HEAD > ~/.gitsavedbranch'
         sbm  = !bash -l -c 'g merge `cat ~/.gitsavedbranch`'
         sbp  = !bash -l -c 'cat ~/.gitsavedbranch'
